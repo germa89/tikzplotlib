@@ -9,6 +9,7 @@ from ._hatches import _mpl_hatch2pgfp_pattern
 from ._markers import _mpl_marker2pgfp_marker
 from ._util import get_legend_text, has_legend
 
+from . import _labels
 
 def draw_path(data, path, draw_options=None, simplify=None):
     """Adds code for drawing an ordinary path in PGFPlots (TikZ).
@@ -224,6 +225,8 @@ def draw_pathcollection(data, obj):
 
     if legend_text is not None:
         content.append(f"\\addlegendentry{{{legend_text}}}\n")
+
+    data, content = _labels.get_label_(data, content)
 
     return data, content
 

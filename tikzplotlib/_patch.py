@@ -3,6 +3,7 @@ import matplotlib as mpl
 from . import _path as mypath
 from ._text import _get_arrow_style
 
+from . import _labels
 
 def draw_patch(data, obj):
     """Return the PGFPlots code for patches.
@@ -153,6 +154,9 @@ def _draw_rectangle(data, obj, draw_options):
             ",".join(draw_options)
         )
         cont += f"\\addlegendentry{{{label}}}\n\n"
+
+    data, cont = _labels.get_label_(data, cont)
+
     return data, cont
 
 

@@ -9,6 +9,7 @@ from . import _path as mypath
 from ._markers import _mpl_marker2pgfp_marker
 from ._util import get_legend_text, has_legend, transform_to_data_coordinates
 
+from . import _labels
 
 def draw_line2d(data, obj):
     """Returns the PGFPlots code for an Line2D environment.
@@ -96,6 +97,8 @@ def draw_line2d(data, obj):
 
     if legend_text is not None:
         content.append(f"\\addlegendentry{{{legend_text}}}\n")
+
+    data, content = _labels.get_label_(data, content)
 
     return data, content
 

@@ -14,6 +14,7 @@ from . import _quadmesh as qmsh
 from . import _text
 from .__about__ import __version__
 
+from . import _labels
 
 def get_tikz_code(
     figure="gcf",
@@ -37,6 +38,8 @@ def get_tikz_code(
     float_format=".15g",
     table_row_sep="\n",
     flavor="latex",
+    add_labels = False,
+    labels = None #
 ):
     """Main function. Here, the recursion into the image starts and the
     contents are picked up. The actual file gets written in this routine.
@@ -133,6 +136,16 @@ def get_tikz_code(
                    Default is ``"latex"``.
     :type flavor: str
 
+    :param add_labels: Add labels to the each plot.
+    :type add_labels: bool
+
+    :param labels: List of strings with the labels to be added to each plot.
+                    If `labels` is none, the default label is `fig.label_XXX`.
+                    If `labels` is a str, the labels will be that str + '_' + '{:g3.0}'.format()
+                    If `labels` is a list, it will try to fit one label to each plot. If failed, it will use the first
+                    list element to generate all the labels as mentioned above.
+    :type labels: str/list
+
     :returns: None
 
     The following optional attributes of matplotlib's objects are recognized
@@ -146,7 +159,7 @@ def get_tikz_code(
     # not as default value because gcf() would be evaluated at import time
     if figure == "gcf":
         figure = plt.gcf()
-    data = {}
+    data = dict()
     data["axis width"] = axis_width
     data["axis height"] = axis_height
     data["rel data path"] = tex_relative_path_to_data
@@ -202,6 +215,37 @@ def get_tikz_code(
     # print message about necessary pgfplot libs to command line
     if show_info:
         _print_pgfplot_libs_message(data)
+
+    # Adding label information to data:
+    data['labels_bool'] = add_labels
+
+    if add_labels:
+        data['labels_plot_count'] = 0
+        data['labels_label_count'] = 0
+
+        num_childrens_ = len(figure.get_children())
+
+        if labels is not None:
+
+            if _labels.valid_string_list(labels):
+
+                if len(labels) == num_childrens_:
+                    data['labels'] = labels
+                else:
+                    print(
+                        "The number of elements in `labels`({}) is different than the number of children in Fig ({}).".format(
+                            len(labels), num_childrens_))
+                    print('Using default labelling')
+                    data['labels'] = None
+
+            elif _labels.valid_string(labels):
+                data['labels'] = [labels for each in range(num_childrens_)]
+
+            else:
+                # Assuming labels == None
+                pass
+        else:
+            data['labels'] = None
 
     # gather the file content
     data, content = _recurse(data, figure)
@@ -388,6 +432,9 @@ def _recurse(data, obj):
             warnings.warn(
                 "tikzplotlib: Don't know how to handle object {}.".format(type(child))
             )
+
+        data = _labels.update_plot_count(data, child, obj)
+
     return data, content.flatten()
 
 
