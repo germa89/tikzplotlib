@@ -223,30 +223,6 @@ def get_tikz_code(
         data['labels_plot_count'] = 0
         data['labels_label_count'] = 0
 
-        num_childrens_ = len(figure.get_children())
-
-        if labels is not None:
-
-            if _labels.valid_string_list(labels):
-
-                if len(labels) == num_childrens_:
-                    data['labels'] = labels
-                else:
-                    print(
-                        "The number of elements in `labels`({}) is different than the number of children in Fig ({}).".format(
-                            len(labels), num_childrens_))
-                    print('Using default labelling')
-                    data['labels'] = None
-
-            elif _labels.valid_string(labels):
-                data['labels'] = [labels for each in range(num_childrens_)]
-
-            else:
-                # Assuming labels == None
-                pass
-        else:
-            data['labels'] = None
-
     # gather the file content
     data, content = _recurse(data, figure)
 

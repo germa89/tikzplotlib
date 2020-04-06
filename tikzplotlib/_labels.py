@@ -38,7 +38,7 @@ def get_label_(data, content):
         counter_label_ = data['labels_label_count']
 
         str_ = f"\\label{{plot_{counter_subplot_:02d}-label_{counter_label_:02d}}}\n"
-        print(str_)
+        # print(str_)
 
         if isinstance(content, str):
             content += str_
